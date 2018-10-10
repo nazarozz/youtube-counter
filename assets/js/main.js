@@ -14,20 +14,35 @@ var HttpClient = function HttpClient() {
 var client = new HttpClient();
 var idChannel = 'UCVswRUcKC-M35RzgPRv8qUg';
 var part = 'statistics,brandingSettings';
-var nameChannel = document.querySelector('#name-channel');
+var titleChannel = document.querySelector('#title-channel');
 var descChannel = document.querySelector('#description-channel');
 var imgChannel = document.querySelector('#img-channel');
 var countChannel = document.querySelector('#count');
 
-var showStat = function showStat() {
-  client.get('https://www.googleapis.com/youtube/v3/channels?part=' + part + '&id=' + idChannel + '&key=AIzaSyCUrZ8fPXGj3hwPtuZdrrElaUY6g62UhFs', function (response) {
+var form = document.querySelector('#form');
+
+var showStat = function showStat(id) {
+  client.get('https://www.googleapis.com/youtube/v3/channels?part=' + part + '&id=' + id + '&key=AIzaSyCUrZ8fPXGj3hwPtuZdrrElaUY6g62UhFs', function (response) {
     var info = JSON.parse(response).items[0];
     console.log(info);
-    nameChannel.innerText = info.brandingSettings.channel.title;
+    titleChannel.innerText = info.brandingSettings.channel.title;
     descChannel.innerText = info.brandingSettings.channel.description;
     countChannel.innerText = info.statistics.subscriberCount;
     imgChannel.src = info.brandingSettings.image.bannerImageUrl;
   });
 };
 
-showStat();
+var searchChannel = function searchChannel(nameChannel) {
+  client.get('https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=1&q=' + nameChannel + '&key=AIzaSyCUrZ8fPXGj3hwPtuZdrrElaUY6g62UhFs', function (response) {
+    var info = JSON.parse(response).items[0].snippet.channelId;
+    showStat(info);
+  });
+};
+
+form.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var nameChannel = document.querySelector('#name-channel').value;
+  searchChannel(nameChannel);
+});
+
+showStat(idChannel);
